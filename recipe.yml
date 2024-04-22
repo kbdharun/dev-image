@@ -11,4 +11,34 @@ stages:
         type: dnf
         source:
           packages:
+            - cargo
+            - conda
+            - distrobox
+            - elixir
+            - fastfetch
+            - gcc
+            - gcc-gfortran
+            - g++
+            - gjs
+            - gjs-devel
+            - golang
+            - htop
+            - java-devel
+            - java-openjdk
+            - lua
+            - nano
+            - nodejs
+            - perl-core
+            - php-cli
+            - podman
             - python3
+            - R
+            - ranger
+            - ruby
+            - rust
+            - sqlite
+            - sqlite-devel
+            - sqlite-tcl
+            - swiftlang
+            - tldr
+            - vim
