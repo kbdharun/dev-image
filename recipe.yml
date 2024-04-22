@@ -1,0 +1,14 @@
+name: Dev image
+id: dev
+stages:
+  - id: build
+    base: fedora:latest
+    singlelayer: false
+    labels:
+      maintainer: Dharun Krishna K B
+    modules:
+      - name: install-pkgs
+        type: dnf
+        source:
+          packages:
+            - python3
