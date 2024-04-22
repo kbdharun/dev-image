@@ -32,3 +32,11 @@ jobs:
       run: |
         docker login ghcr.io -u ${{ env.REGISTRY_USER }} -p ${{ env.REGISTRY_PASSWORD }}
         docker image push "ghcr.io/kbdharun/dev-image:main"
+
+    - uses: sigstore/cosign-installer@v3.5.0
+    - name: Sign container image
+      run: |
+         cosign sign -y --key env://COSIGN_PRIVATE_KEY ghcr.io/kbdharun/dev-image:main
+      env:
+          COSIGN_EXPERIMENTAL: false
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
