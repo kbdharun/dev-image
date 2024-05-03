@@ -1,0 +1,36 @@
+name: Image (PR)
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  IMAGE_NAME: dev-image
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    permissions:
+        contents: read
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: vanilla-os/vib-gh-action@v0.7.0
+      with:
+        recipe: 'recipe.yml'
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: Containerfile
+        path: Containerfile
+
+    - name: Rename Containerfile to Dockerfile
+      run: mv Containerfile Dockerfile
+
+    - name: Build and push image
+      uses: docker/build-push-action@v5.3.0
+      with:
+        context: .
+        push: false
+        tags: ${{ github.actor }}/${{ env.IMAGE_NAME }}:main
