@@ -35,7 +35,7 @@ jobs:
       id: push-ghcr
       uses: docker/build-push-action@v5.3.0
       with:
-        context: Containerfile
+        context: ./Containerfile
         push: true
         tags: ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:main
     
