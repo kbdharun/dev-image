@@ -1,0 +1,4 @@
+{
+    "name": "Dharun's Fedora Dev Container",
+    "image": "ghcr.io/kbdharun/dev-image:main"
+}

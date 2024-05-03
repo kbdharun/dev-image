@@ -12,7 +12,7 @@ Type the following command to create an container of this image in [Distrobox](h
 distrobox create -n dev -i ghcr.io/kbdharun/dev-image:main
 ```
 
-> [!NOTE]
+> [!TIP]
 > To create a rootful container, add the `--root` flag to the above command (i.e. `distrobox create -n dev -i ghcr.io/kbdharun/dev-image:main --root`).
 
 Type the following command to enter the container:
