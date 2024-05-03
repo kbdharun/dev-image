@@ -3,6 +3,9 @@ name: Image
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - recipe.yml
+      - .github/workflows/image.yml
   workflow_dispatch:
 
 env:
@@ -15,6 +18,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      packages: write
       attestations: write
 
     steps:
@@ -38,7 +42,7 @@ jobs:
 
     - name: Rename Containerfile to Dockerfile
       run: mv Containerfile Dockerfile
-
+  
     - name: Build and push image
       id: push-ghcr
       uses: docker/build-push-action@v5.3.0
