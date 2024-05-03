@@ -1,5 +1,7 @@
 # dev-image
 
+[![Image](https://github.com/kbdharun/dev-image/actions/workflows/image.yml/badge.svg)](https://github.com/kbdharun/dev-image/actions/workflows/image.yml)
+
 This repository contains all my development packages preinstalled inside a Container image built using [Vib](https://github.com/Vanilla-OS/Vib).
 
 ## Using the Container Image with Distrobox
@@ -10,13 +12,16 @@ Type the following command to create an container of this image in [Distrobox](h
 distrobox create -n dev -i ghcr.io/kbdharun/dev-image:main
 ```
 
+> [!NOTE]
+> To create a rootful container, add the `--root` flag to the above command (i.e. `distrobox create -n dev -i ghcr.io/kbdharun/dev-image:main --root`).
+
 Type the following command to enter the container:
 
 ```sh
 distrobox enter dev
 ```
 
-## Verify the container image using Cosign
+## Verify the Container Image using Cosign
 
 To verify the container image using [`cosign`](https://github.com/sigstore/cosign) (download the `cosign.pub` file from [here](https://github.com/kbdharun/dev-image/blob/main/cosign.pub) and execute the following command):
 
