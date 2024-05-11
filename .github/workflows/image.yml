@@ -3,34 +3,35 @@ name: Build and Push Image
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - recipe.yml
-      - .github/workflows/image.yml
     tags:
       - '*'
   workflow_dispatch:
   pull_request:
+    branches: [ "main" ]
+    paths:
+      - recipe.yml
+      - .github/workflows/image.yml
 
 env:
-  BUILDX_NO_DEFAULT_ATTESTATIONS: 1
+  BUILDX_NO_DEFAULT_ATTESTATIONS: 1 # Disable provenance
 
 jobs:
   image:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
+      id-token: write # Additional permissions for persistance of attestations
       contents: read
-      packages: write
-      attestations: write
+      packages: write # To push to GHCR
+      attestations: write # To create and write attestations
 
     steps:
     - uses: actions/checkout@v4
 
-    - uses: vanilla-os/vib-gh-action@v0.7.0
+    - uses: vanilla-os/vib-gh-action@v0.7.0 # Build the recipe using Vib
       with:
         recipe: 'recipe.yml'
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v4 # Upload the built Containerfile for debugging
       with:
         name: Containerfile
         path: Containerfile
@@ -41,7 +42,7 @@ jobs:
         echo "REPO_OWNER_LOWERCASE=$REPO_OWNER_LOWERCASE" >> "$GITHUB_ENV"
         echo "IMAGE_NAME=ghcr.io/$REPO_OWNER_LOWERCASE/dev-image" >> "$GITHUB_ENV"
 
-    - name: Docker meta
+    - name: Docker meta # Generate tags
       id: docker_meta
       uses: docker/metadata-action@v5
       with:
@@ -54,8 +55,8 @@ jobs:
           type=semver,pattern=v{{major}}
           type=ref,event=branch
 
-    # - name: Set up QEMU
-    #   uses: docker/setup-qemu-action@v3
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -76,7 +77,7 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.docker_meta.outputs.tags }}
         labels: ${{ steps.docker_meta.outputs.labels }}
-        platforms: linux/amd64
+        platforms: linux/amd64, linux/arm64
         cache-from: type=gha
         cache-to: type=gha,mode=max
         provenance: false
