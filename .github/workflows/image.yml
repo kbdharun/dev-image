@@ -1,4 +1,4 @@
-name: Image
+name: Build and Push Image
 
 on:
   push:
@@ -6,11 +6,13 @@ on:
     paths:
       - recipe.yml
       - .github/workflows/image.yml
+    tags:
+      - '*'
   workflow_dispatch:
+  pull_request:
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: dev-image
+  BUILDX_NO_DEFAULT_ATTESTATIONS: 1
 
 jobs:
   image:
@@ -33,8 +35,27 @@ jobs:
         name: Containerfile
         path: Containerfile
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+    - name: Generate image name
+      run: |
+        REPO_OWNER_LOWERCASE="$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')"
+        echo "REPO_OWNER_LOWERCASE=$REPO_OWNER_LOWERCASE" >> "$GITHUB_ENV"
+        echo "IMAGE_NAME=ghcr.io/$REPO_OWNER_LOWERCASE/dev-image" >> "$GITHUB_ENV"
+
+    - name: Docker meta
+      id: docker_meta
+      uses: docker/metadata-action@v5
+      with:
+        images: |
+          ${{ env. IMAGE_NAME }}
+        tags: |
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{raw}}
+          type=semver,pattern=v{{major}}
+          type=ref,event=branch
+
+    # - name: Set up QEMU
+    #   uses: docker/setup-qemu-action@v3
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -42,26 +63,28 @@ jobs:
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v3
       with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Rename Containerfile to Dockerfile
-      run: mv Containerfile Dockerfile
   
     - name: Build and push image
       id: push-ghcr
       uses: docker/build-push-action@v5.3.0
       with:
         context: .
-        push: true
-        platforms: linux/amd64,linux/arm64
-        tags: ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:main
+        file: Containerfile
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.docker_meta.outputs.tags }}
+        labels: ${{ steps.docker_meta.outputs.labels }}
+        platforms: linux/amd64
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
     
     - uses: sigstore/cosign-installer@v3.5.0
     - name: Sign container image
       run: |
-        cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:main
+        cosign sign -y --key env://COSIGN_PRIVATE_KEY ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ steps.docker_meta.outputs.tags }}
       env:
         COSIGN_EXPERIMENTAL: false
         COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
@@ -70,6 +93,6 @@ jobs:
       uses: actions/attest-build-provenance@v1
       id: attest
       with:
-        subject-name: ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}
+        subject-name: ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}
         subject-digest: ${{ steps.push-ghcr.outputs.digest }}
         push-to-registry: true
