@@ -25,20 +25,27 @@ stages:
             - htop
             - java-devel
             - java-openjdk
+            - jq
             - lua
+            - make
+            - meson
             - nano
+            - ninja-build
             - nodejs
             - perl-core
             - php-cli
+            - pandoc
             - podman
             - python3
             - R
             - ranger
             - ruby
             - rust
+            - rustfmt
             - sqlite
             - sqlite-devel
             - sqlite-tcl
             - swiftlang
             - tldr
+            - tmux
             - vim
