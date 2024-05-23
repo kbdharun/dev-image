@@ -21,7 +21,7 @@ jobs:
   image:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write # Additional permissions for persistance of attestations
+      id-token: write # Additional permissions for the persistence of attestations
       contents: read
       packages: write # To push to GHCR
       attestations: write # To create and write attestations
@@ -72,7 +72,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
   
     - name: Build and push image
-      id: push-ghcr
+      id: push
       uses: docker/build-push-action@v5.3.0
       with:
         context: .
@@ -99,6 +99,6 @@ jobs:
       id: attest
       if: github.repository == 'kbdharun/dev-image' && github.event_name != 'pull_request'
       with:
-        subject-name: ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}
-        subject-digest: ${{ steps.push-ghcr.outputs.digest }}
+        subject-name: ghcr.io/${{ env.IMAGE_NAME }}
+        subject-digest: ${{ steps.push.outputs.digest }}
         push-to-registry: false
