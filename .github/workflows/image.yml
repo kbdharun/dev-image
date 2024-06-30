@@ -29,7 +29,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - uses: vanilla-os/vib-gh-action@v0.7.0 # Build the recipe using Vib
+    - uses: vanilla-os/vib-gh-action@v0.7.2 # Build the recipe using Vib
       with:
         recipe: 'recipe.yml'
 
@@ -73,7 +73,7 @@ jobs:
   
     - name: Build and push image
       id: push
-      uses: docker/build-push-action@v5.3.0
+      uses: docker/build-push-action@v6
       with:
         context: .
         file: Containerfile
