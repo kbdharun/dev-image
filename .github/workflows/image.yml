@@ -32,6 +32,7 @@ jobs:
     - uses: vanilla-os/vib-gh-action@v0.7.2 # Build the recipe using Vib
       with:
         recipe: 'recipe.yml'
+        plugins: 'kbdharun/vib-dnf:v0.1' 
 
     - uses: actions/upload-artifact@v4 # Upload the built Containerfile for debugging
       with:
