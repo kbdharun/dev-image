@@ -34,7 +34,7 @@ jobs:
         recipe: 'recipe.yml'
         plugins: 'kbdharun/vib-dnf:v0.1.1' 
 
-    - uses: actions/upload-artifact@v4 # Upload the built Containerfile for debugging
+    - uses: actions/upload-artifact@v5 # Upload the built Containerfile for debugging
       with:
         name: Containerfile
         path: Containerfile
